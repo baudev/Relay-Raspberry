@@ -1,5 +1,3 @@
-// @ts-ignore
-declare function require(name:string);
 const express = require('express');
 const uuid = require('uuid/v4');
 const session = require('express-session');
@@ -8,10 +6,14 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const fs = require('fs');
-const Gpio = require('onoff').Gpio;
+import {Relay} from "./src/Entity/Relay";
 
+// We import users data
 let users = fs.readFileSync('./users.json');
 users = JSON.parse(users);
+
+// We create the relay entity
+let relay : Relay = new Relay(4);
 
 // configure passport.js to use the local strategy
 passport.use(new LocalStrategy(
@@ -91,11 +93,20 @@ app.post('/login', (req, res, next) => {
     })(req, res, next);
 })
 
-app.get('/authrequired', (req, res) => {
-    console.log('Inside GET /authrequired callback')
-    console.log(`User authenticated? ${req.isAuthenticated()}`)
+app.get('/panel', (req, res) => {
+    console.log('Inside GET /panel callback')
     if(req.isAuthenticated()) {
-        res.send('you hit the authentication endpoint\n')
+        res.send('Panel template')
+    } else {
+        res.redirect('/')
+    }
+})
+
+app.get('/relay', (req, res) => {
+    console.log('Inside GET /relay callback')
+    if(req.isAuthenticated()) {
+        // We return the current state of the relay
+        res.send(`Relay state: ${relay.getState()}`)
     } else {
         res.redirect('/')
     }
