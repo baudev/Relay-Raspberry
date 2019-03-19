@@ -112,6 +112,26 @@ app.get('/relay', (req, res) => {
     }
 })
 
+app.post('/set_relay', async (req, res) => {
+    console.log('Inside GET /relay callback')
+    if (req.isAuthenticated()) {
+        // We update the state of the Relay
+        if (req.body.state == 1) {
+            relay.enable()
+                .then(res.send('OK'))
+                .catch(res.send('Error'))
+        } else if(req.body.state == 0) {
+            relay.disable()
+                .then(res.send('OK'))
+                .catch(res.send('Error'))
+        } else {
+            res.send('Error')
+        }
+    } else {
+        res.redirect('/')
+    }
+})
+
 // tell the server what port to listen on
 app.listen(3000, () => {
     console.log('Listening on localhost:3000')
