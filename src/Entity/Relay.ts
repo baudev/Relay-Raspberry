@@ -27,6 +27,8 @@ export class Relay extends Gpio {
      * Enables the relay.
      */
     public enable() : Promise<void> {
+        // TODO use watch method to disable automatically the relay after X seconds
+        // this.watch()
         return this.write(1);
     }
 
