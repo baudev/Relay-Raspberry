@@ -9,6 +9,7 @@
   "author": "Baudev",
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^11.11.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
