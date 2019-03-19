@@ -1,4 +1,5 @@
 import {BinaryValue} from "onoff";
+import {Promise} from 'es6-promise'
 
 const Gpio = require('onoff').Gpio;
 
