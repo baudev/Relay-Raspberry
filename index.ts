@@ -98,7 +98,7 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/restricted', restrict, function (req, res) {
-
+    res.render('panel.ejs')
 });
 
 app.use('/src', express.static(staticFilesPath));  // allow /src directory to be public
