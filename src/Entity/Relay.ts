@@ -8,7 +8,7 @@ const Gpio = require('onoff').Gpio;
  * @author Baudev
  * @since 1.0
  */
-export class Relay extends Gpio {
+export default class Relay extends Gpio {
 
     static ENABLED = 1;
     static DISABLED = 0;

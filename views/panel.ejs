@@ -26,10 +26,10 @@
             <div class="card-panel white center-align">
                 <h3>RELAY NAME</h3>
                 <p>The siren will be disabled automatically after 5 minutes.<br>
-                    Current state: <span class="green-text">Disabled</span>
+                    Current state: <span class="<%if (state) { %>red<% } else { %>green<% } %>-text"><%if (state) { %>Enabled<% } else { %>Disabled <% } %></span>
                 </p>
-                <a class="red darken-1 waves-effect waves-light btn-large" style="margin-bottom: 5px"><i class="material-icons left">check</i>ENABLE</a>
-                <a class="green waves-effect waves-light btn-large" style="margin-bottom: 5px"><i class="material-icons left">clear</i>DISABLE</a>
+                <a href="change_state?value=true" class="red darken-1 waves-effect waves-light btn-large" style="margin-bottom: 5px"><i class="material-icons left">check</i>ENABLE</a>
+                <a href="change_state?value=false" class="green waves-effect waves-light btn-large" style="margin-bottom: 5px"><i class="material-icons left">clear</i>DISABLE</a>
             </div>
         </div>
     </div>

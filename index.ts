@@ -1,4 +1,6 @@
 import {Log} from "./src/LogUtil";
+import Relay from "./src/Entity/Relay";
+
 
 const express = require('express');
 const path = require('path');
@@ -6,6 +8,7 @@ const session = require('express-session');
 const fs = require('fs');
 const _ = require('lodash');
 
+const relay = new Relay(4);
 const app = express();
 
 // We import users data
@@ -81,7 +84,7 @@ app.post('/login', function (req, res) {
                 // or in this case the entire user object
                 req.session.user = userConnected;
                 req.session.success = 'Authenticated as ' + userConnected.username;
-                res.redirect('/restricted');
+                res.redirect('/panel');
             });
         } else {
             req.session.error = true;
@@ -97,14 +100,21 @@ app.get('/logout', function (req, res) {
     });
 });
 
-app.get('/restricted', restrict, function (req, res) {
-    res.render('panel.ejs')
+app.get('/panel', restrict, async function (req, res) {
+    const state: number = await relay.getState();
+    res.render('panel.ejs', {state : state})
 });
 
 app.use('/src', express.static(staticFilesPath));  // allow /src directory to be public
 
-app.get('/enable', restrict, function (req, res) {
-
+app.get('/change_state', restrict, async function (req, res) {
+    const state = req.query.value;
+    if (state) {
+        await relay.enable();
+    } else {
+        await relay.disable();
+    }
+    res.redirect('/panel')
 });
 
 //start server
