@@ -9,19 +9,18 @@
   "author": "Baudev",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^11.11.3",
-    "body-parser": "^1.18.3",
-    "express": "^4.16.4",
-    "express-session": "^1.15.6",
-    "fs": "0.0.1-security",
+    "@types/es6-promise": "^3.3.0",
+    "@types/node": "^11.11.6",
     "onoff": "^4.1.1",
-    "passport": "^0.4.0",
-    "passport-local": "^1.0.0",
-    "session-file-store": "^1.2.0",
-    "uuid": "^3.3.2"
+    "express": "^4.16.4",
+    "path": "^0.12.7",
+    "express-session": "^1.15.6",
+    "simple-node-logger": "^18.12.22",
+    "fs": "^0.0.1-security",
+    "lodash": "^4.17.11",
+    "ejs": "^2.6.1"
   },
   "devDependencies": {
-    "@types/es6-promise": "^3.3.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.4000"
   }
 }
