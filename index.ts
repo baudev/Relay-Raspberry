@@ -8,15 +8,20 @@ const session = require('express-session');
 const fs = require('fs');
 const _ = require('lodash');
 
-const relay = new Relay(4);
-const app = express();
-
 // We import users data
 let users = fs.readFileSync('./users.json');
+
 users = JSON.parse(users);
+// We import settings data
+let settings = fs.readFileSync('./settings.json');
+settings = JSON.parse(settings);
+
+// We instantiate server and the Relay
+const relay = new Relay(settings.GPIONumber);
+const app = express();
 
 // We set the logs mode
-Log.enableDebugMode(true);
+Log.enableDebugMode(settings.DebugMode);
 
 //Server configuration
 app.set('view engine', 'ejs');
@@ -112,7 +117,7 @@ app.get('/panel', restrict, async function (req, res) {
     Log.info('Access to panel.');
     const state: number = await relay.getState();
     Log.debug('Panel state: ' + state);
-    res.render('panel.ejs', {state : state})
+    res.render('panel.ejs', {state : state, panelName: settings.PanelName, relayName: settings.RelayName, disableAfterXSeconds: relay.disableAfterXSeconds})
 });
 
 app.get('/change_state', restrict, async function (req, res) {

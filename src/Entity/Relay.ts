@@ -11,15 +11,20 @@ const Gpio = require('onoff').Gpio;
  */
 export default class Relay extends Gpio {
 
+    private _disableAfterXSeconds: number;
+
     /**
      * Defines a Relay by his GPIO Pin.
      * @param gpioPin
+     * @param disableAfterXSeconds
      * @see Gpio
      */
-    constructor(gpioPin: number) {
+    constructor(gpioPin: number, disableAfterXSeconds : number = 5000) {
         super(gpioPin, 'out');
         Log.info('Relay instantiated');
         this.disable(); // we disable on start the relay
+        Log.info('The relay will be disabled automatically after ' + disableAfterXSeconds + ' seconds');
+        this.disableAfterXSeconds = disableAfterXSeconds;
     }
 
     /**
@@ -29,9 +34,9 @@ export default class Relay extends Gpio {
         let that: Relay = this;
         // we disable the relay after 5 minutes automatically
         setTimeout(function () {
-            Log.info('Disabling automatically the relay...')
+            Log.info('Disabling automatically the relay...');
             that.disable();
-        }, 300000);
+        }, this.disableAfterXSeconds * 1000);
         Log.info('Enabling the relay...');
         return this.write(1);
     }
@@ -40,7 +45,7 @@ export default class Relay extends Gpio {
      * Disables the relay.
      */
     public disable() : Promise<void> {
-        Log.info('Disabling the relay...')
+        Log.info('Disabling the relay...');
         return this.write(0);
     }
 
@@ -53,4 +58,12 @@ export default class Relay extends Gpio {
         return this.read();
     }
 
+
+    get disableAfterXSeconds(): number {
+        return this._disableAfterXSeconds;
+    }
+
+    set disableAfterXSeconds(value: number) {
+        this._disableAfterXSeconds = value;
+    }
 }

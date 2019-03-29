@@ -10,13 +10,13 @@
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="Refresh" content="300">
+    <meta http-equiv="Refresh" content="<%= disableAfterXSeconds %>">
 </head>
 <body>
 
 <nav>
     <div class="nav-wrapper">
-        <a href="#" class="brand-logo center">PANEL</a>
+        <a href="#" class="brand-logo center"><%= panelName %></a>
     </div>
 </nav>
 <div class="container">
@@ -25,8 +25,8 @@
     <div class="row">
         <div class="col s12">
             <div class="card-panel white center-align">
-                <h3>RELAY NAME</h3>
-                <p>The siren will be disabled automatically after 5 minutes.<br>
+                <h3><%= relayName %></h3>
+                <p>The siren will be disabled automatically after <%= disableAfterXSeconds %> minutes.<br>
                     Current state: <span class="<%if (state) { %>red<% } else { %>green<% } %>-text"><%if (state) { %>Enabled<% } else { %>Disabled <% } %></span>
                 </p>
                 <a href="change_state?value=true" class="red darken-1 waves-effect waves-light btn-large" style="margin-bottom: 5px"><i class="material-icons left">check</i>ENABLE</a>
