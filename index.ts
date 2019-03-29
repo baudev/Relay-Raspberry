@@ -17,7 +17,7 @@ let settings = fs.readFileSync('./settings.json');
 settings = JSON.parse(settings);
 
 // We instantiate server and the Relay
-const relay = new Relay(settings.GPIONumber);
+const relay = new Relay(settings.GPIONumber, settings.DisableAfterXSeconds);
 const app = express();
 
 // We set the logs mode
