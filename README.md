@@ -32,7 +32,9 @@ sudo node index.js // run the server!
 
 ## Electronic Notes
 
-![Electronic Schema](/doc/schema.png)
+<p align="center">
+  <img src="/doc/schema.png">
+</p>
 
 This project uses:
 
