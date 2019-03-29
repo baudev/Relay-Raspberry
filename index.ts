@@ -1,4 +1,4 @@
-import {Log} from "./src/LogUtil";
+import Log from "./src/LogUtil";
 import Relay from "./src/Entity/Relay";
 
 
@@ -15,20 +15,21 @@ const app = express();
 let users = fs.readFileSync('./users.json');
 users = JSON.parse(users);
 
-const appPath = path.join(__dirname);
+// We set the logs mode
+Log.enableDebugMode(true);
 
 //Server configuration
 app.set('view engine', 'ejs');
+const appPath = path.join(__dirname);
 let viewPath = path.join(appPath, 'views');
-let staticFilesPath = path.join(appPath, 'views');
 app.set('views', viewPath);
 
 // middleware
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
 app.use(session({
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
-    secret: 'shhhh, very secret'
+    secret: 'secret_value'
 }));
 
 // Session-persisted message middleware
@@ -44,9 +45,11 @@ app.use(function (req, res, next) {
 });
 
 function restrict(req, res, next) {
+    Log.debug(req);
     if (req.session.user) {
         next();
     } else {
+        Log.info('Access refused!');
         req.session.error = 'Access refused!';
         res.redirect('/login');
     }
@@ -60,10 +63,12 @@ app.get('/', function (req, res) {
 });
 
 app.get('/login', function (req, res) {
+    Log.info('Access to /login');
     res.render('login');
 });
 
 app.post('/login', function (req, res) {
+    Log.info('Connection to /login');
     let isCorrectAuth: boolean = false;
     let userConnected = null;
     _.forEach(users, (user) => {
@@ -75,24 +80,28 @@ app.post('/login', function (req, res) {
             }
         }
     });
-        if (userConnected) {
-            // Regenerate session when signing in
-            // to prevent fixation
-            req.session.regenerate(function () {
-                // Store the user's primary key
-                // in the session store to be retrieved,
-                // or in this case the entire user object
-                req.session.user = userConnected;
-                req.session.success = 'Authenticated as ' + userConnected.username;
-                res.redirect('/panel');
-            });
-        } else {
-            req.session.error = true;
-            res.redirect('/login');
-        }
+    Log.debug(userConnected);
+    if (userConnected) {
+        Log.info('Connection to /login succeed.');
+        // Regenerate session when signing in
+        // to prevent fixation
+        req.session.regenerate(function () {
+            // Store the user's primary key
+            // in the session store to be retrieved,
+            // or in this case the entire user object
+            req.session.user = userConnected;
+            req.session.success = 'Authenticated as ' + userConnected.username;
+            res.redirect('/panel');
+        });
+    } else {
+        Log.info('Connection to /login failed.');
+        req.session.error = true;
+        res.redirect('/login');
+    }
 });
 
 app.get('/logout', function (req, res) {
+    Log.info('User logout.');
     // destroy the user's session to log them out
     // will be re-created next request
     req.session.destroy(function () {
@@ -101,17 +110,20 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/panel', restrict, async function (req, res) {
+    Log.info('Access to panel.');
     const state: number = await relay.getState();
+    Log.debug('Panel state: ' + state);
     res.render('panel.ejs', {state : state})
 });
 
-app.use('/src', express.static(staticFilesPath));  // allow /src directory to be public
-
 app.get('/change_state', restrict, async function (req, res) {
     const state = req.query.value;
-    if (state) {
+    Log.debug('Order state value: ' + state);
+    if (state == 'true') {
+        Log.info('Relay enable order');
         await relay.enable();
     } else {
+        Log.info('Relay disable order');
         await relay.disable();
     }
     res.redirect('/panel')
@@ -119,4 +131,4 @@ app.get('/change_state', restrict, async function (req, res) {
 
 //start server
 app.listen(3000);
-Log.info('Express started on port 3000');
+Log.info('Server started on port 3000');
