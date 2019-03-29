@@ -1,4 +1,4 @@
-import Log from "./src/LogUtil";
+import Log from "./src/Entity/LogUtil";
 import Relay from "./src/Entity/Relay";
 
 
@@ -10,8 +10,8 @@ const _ = require('lodash');
 
 // We import users data
 let users = fs.readFileSync('./users.json');
-
 users = JSON.parse(users);
+
 // We import settings data
 let settings = fs.readFileSync('./settings.json');
 settings = JSON.parse(settings);
@@ -25,7 +25,7 @@ Log.enableDebugMode(settings.DebugMode);
 
 //Server configuration
 app.set('view engine', 'ejs');
-const appPath = path.join(__dirname);
+const appPath = path.join(__dirname, 'src');
 let viewPath = path.join(appPath, 'views');
 app.set('views', viewPath);
 
