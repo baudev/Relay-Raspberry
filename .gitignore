@@ -7,5 +7,5 @@ node_modules/
 # IntelliJ
 .idea
 
-# Generated directories or files
-sessions
+# Config
+users.json

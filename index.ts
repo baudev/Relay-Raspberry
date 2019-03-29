@@ -1,138 +1,138 @@
+import Log from "./src/Entity/LogUtil";
+import Relay from "./src/Entity/Relay";
+
+
 const express = require('express');
-const uuid = require('uuid/v4');
+const path = require('path');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
-const bodyParser = require('body-parser');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const fs = require('fs');
-import {Relay} from "./src/Entity/Relay";
+const _ = require('lodash');
 
 // We import users data
 let users = fs.readFileSync('./users.json');
 users = JSON.parse(users);
 
-// We create the relay entity
-let relay : Relay = new Relay(4);
+// We import settings data
+let settings = fs.readFileSync('./settings.json');
+settings = JSON.parse(settings);
 
-// configure passport.js to use the local strategy
-passport.use(new LocalStrategy(
-    { usernameField: 'email' },
-    (email, password, done) => {
-        console.log('Inside local strategy callback')
-        // here is where you make a call to the database
-        // to find the user based on their username or email address
-        // for now, we'll just pretend we found that it was users[0]
-        const user = users[0]
-        if(email === user.email && password === user.password) {
-            console.log('Local strategy returned true')
-            return done(null, user)
-        }
-    }
-));
-
-// tell passport how to serialize the user
-passport.serializeUser((user, done) => {
-    console.log('Inside serializeUser callback. User id is save to the session file store here')
-    done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-    console.log('Inside deserializeUser callback')
-    console.log(`The user id passport saved in the session file store is: ${id}`)
-    const user = users[0].id === id ? users[0] : false;
-    done(null, user);
-});
-
-// create the server
+// We instantiate server and the Relay
+const relay = new Relay(settings.GPIONumber, settings.DisableAfterXSeconds);
 const app = express();
 
-// add & configure middleware
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+// We set the logs mode
+Log.enableDebugMode(settings.DebugMode);
+
+//Server configuration
+app.set('view engine', 'ejs');
+const appPath = path.join(__dirname, 'src');
+let viewPath = path.join(appPath, 'views');
+app.set('views', viewPath);
+
+// middleware
+app.use(express.urlencoded({ extended: false }));
 app.use(session({
-    genid: (req) => {
-        console.log('Inside session middleware genid function')
-        console.log(`Request object sessionID from client: ${req.sessionID}`)
-        return uuid() // use UUIDs for session IDs
-    },
-    store: new FileStore(),
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: true
-}))
-app.use(passport.initialize());
-app.use(passport.session());
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    secret: 'secret_value'
+}));
 
-// create the homepage route at '/'
-app.get('/', (req, res) => {
-    console.log('Inside the homepage callback')
-    console.log(req.sessionID)
-    res.send(`You got home page!\n`)
-})
+// Session-persisted message middleware
+app.use(function (req, res, next) {
+    var err = req.session.error;
+    var msg = req.session.success;
+    delete req.session.error;
+    delete req.session.success;
+    res.locals.message = '';
+    if (err) res.locals.message = 'invalid';
+    if (msg) res.locals.message = msg;
+    next();
+});
 
-// create the login get and post routes
-app.get('/login', (req, res) => {
-    console.log('Inside GET /login callback')
-    console.log(req.sessionID)
-    res.send(`You got the login page!\n`)
-})
-
-app.post('/login', (req, res, next) => {
-    console.log('Inside POST /login callback')
-    passport.authenticate('local', (err, user, info) => {
-        console.log('Inside passport.authenticate() callback');
-        console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
-        console.log(`req.user: ${JSON.stringify(req.user)}`)
-        req.login(user, (err) => {
-            console.log('Inside req.login() callback')
-            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
-            console.log(`req.user: ${JSON.stringify(req.user)}`)
-            return res.send('You were authenticated & logged in!\n');
-        })
-    })(req, res, next);
-})
-
-app.get('/panel', (req, res) => {
-    console.log('Inside GET /panel callback')
-    if(req.isAuthenticated()) {
-        res.send('Panel template')
+function restrict(req, res, next) {
+    if (req.session.user) {
+        next();
     } else {
-        res.redirect('/')
+        Log.info('Access refused!');
+        req.session.error = 'Access refused!';
+        res.redirect('/login');
     }
-})
+}
 
-app.get('/relay', (req, res) => {
-    console.log('Inside GET /relay callback')
-    if(req.isAuthenticated()) {
-        // We return the current state of the relay
-        res.send(`Relay state: ${relay.getState()}`)
-    } else {
-        res.redirect('/')
-    }
-})
+/**
+ * API
+ */
+app.get('/', function (req, res) {
+    res.redirect('/login');
+});
 
-app.post('/set_relay', async (req, res) => {
-    console.log('Inside GET /relay callback')
-    if (req.isAuthenticated()) {
-        // We update the state of the Relay
-        if (req.body.state == 1) {
-            relay.enable()
-                .then(res.send('OK'))
-                .catch(res.send('Error'))
-        } else if(req.body.state == 0) {
-            relay.disable()
-                .then(res.send('OK'))
-                .catch(res.send('Error'))
-        } else {
-            res.send('Error')
+app.get('/login', function (req, res) {
+    Log.info('Access to /login');
+    res.render('login');
+});
+
+app.post('/login', function (req, res) {
+    Log.info('Connection to /login');
+    let isCorrectAuth: boolean = false;
+    let userConnected = null;
+    _.forEach(users, (user) => {
+        if(user.username == req.body.username) {
+            if(user.password == req.body.password) {
+                isCorrectAuth = true;
+                userConnected = user;
+                return false;
+            }
         }
+    });
+    Log.debug(userConnected);
+    if (userConnected) {
+        Log.info('Connection to /login succeed.');
+        // Regenerate session when signing in
+        // to prevent fixation
+        req.session.regenerate(function () {
+            // Store the user's primary key
+            // in the session store to be retrieved,
+            // or in this case the entire user object
+            req.session.user = userConnected;
+            req.session.success = 'Authenticated as ' + userConnected.username;
+            res.redirect('/panel');
+        });
     } else {
-        res.redirect('/')
+        Log.info('Connection to /login failed.');
+        req.session.error = true;
+        res.redirect('/login');
     }
-})
+});
 
-// tell the server what port to listen on
-app.listen(3000, () => {
-    console.log('Listening on localhost:3000')
-})
+app.get('/logout', function (req, res) {
+    Log.info('User logout.');
+    // destroy the user's session to log them out
+    // will be re-created next request
+    req.session.destroy(function () {
+        res.redirect('/');
+    });
+});
+
+app.get('/panel', restrict, async function (req, res) {
+    Log.info('Access to panel.');
+    const state: number = await relay.getState();
+    Log.debug('Panel state: ' + state);
+    res.render('panel.ejs', {state : state, panelName: settings.PanelName, relayName: settings.RelayName, disableAfterXSeconds: relay.disableAfterXSeconds})
+});
+
+app.get('/change_state', restrict, async function (req, res) {
+    const state = req.query.value;
+    Log.debug('Order state value: ' + state);
+    if (state == 'true') {
+        Log.info('Relay enable order');
+        await relay.enable();
+    } else {
+        Log.info('Relay disable order');
+        await relay.disable();
+    }
+    res.redirect('/panel')
+});
+
+//start server
+app.listen(3000);
+Log.info('Server started on port 3000');

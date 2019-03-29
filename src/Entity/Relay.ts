@@ -1,5 +1,6 @@
 import {BinaryValue} from "onoff";
 import {Promise} from 'es6-promise'
+import Log from "./LogUtil";
 
 const Gpio = require('onoff').Gpio;
 
@@ -8,27 +9,35 @@ const Gpio = require('onoff').Gpio;
  * @author Baudev
  * @since 1.0
  */
-export class Relay extends Gpio {
+export default class Relay extends Gpio {
 
-    static ENABLED = 1;
-    static DISABLED = 0;
-    static STATE = Relay.ENABLED | Relay.DISABLED;
+    private _disableAfterXSeconds: number;
 
     /**
      * Defines a Relay by his GPIO Pin.
      * @param gpioPin
+     * @param disableAfterXSeconds
      * @see Gpio
      */
-    constructor(gpioPin: number) {
+    constructor(gpioPin: number, disableAfterXSeconds : number = 5000) {
         super(gpioPin, 'out');
+        Log.info('Relay instantiated');
+        this.disable(); // we disable on start the relay
+        Log.info('The relay will be disabled automatically after ' + disableAfterXSeconds + ' seconds');
+        this.disableAfterXSeconds = disableAfterXSeconds;
     }
 
     /**
      * Enables the relay.
      */
     public enable() : Promise<void> {
-        // TODO use watch method to disable automatically the relay after X seconds
-        // this.watch()
+        let that: Relay = this;
+        // we disable the relay after 5 minutes automatically
+        setTimeout(function () {
+            Log.info('Disabling automatically the relay...');
+            that.disable();
+        }, this.disableAfterXSeconds * 1000);
+        Log.info('Enabling the relay...');
         return this.write(1);
     }
 
@@ -36,26 +45,25 @@ export class Relay extends Gpio {
      * Disables the relay.
      */
     public disable() : Promise<void> {
+        Log.info('Disabling the relay...');
         return this.write(0);
     }
 
     /**
      * Returns the current state of the Relay.
-     * @see Relay.STATE
+     * @see BinaryValue
      */
     public getState() : Promise<number> {
-        return new Promise<number>(((resolve, reject) => {
-            this.read()
-                .then((value: BinaryValue) => {
-                    // depending of the GPIO state
-                    if(value == Gpio.HIGH) {
-                        return resolve(Relay.ENABLED);
-                    } else {
-                        return resolve(Relay.DISABLED);
-                    }
-                })
-                .catch((reason => reject(reason)));
-        }))
+        Log.info('Getting current state of the relay');
+        return this.read();
     }
 
+
+    get disableAfterXSeconds(): number {
+        return this._disableAfterXSeconds;
+    }
+
+    set disableAfterXSeconds(value: number) {
+        this._disableAfterXSeconds = value;
+    }
 }
