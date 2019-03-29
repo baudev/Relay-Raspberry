@@ -4,6 +4,7 @@
   "description": "Enables a relay with a Raspberry Pi through a web server",
   "main": "index.js",
   "scripts": {
+    "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Baudev",
