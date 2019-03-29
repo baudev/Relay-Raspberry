@@ -45,7 +45,6 @@ app.use(function (req, res, next) {
 });
 
 function restrict(req, res, next) {
-    Log.debug(req);
     if (req.session.user) {
         next();
     } else {
