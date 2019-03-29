@@ -31,7 +31,7 @@ export default class Relay extends Gpio {
         setTimeout(function () {
             Log.info('Disabling automatically the relay...')
             that.disable();
-        }, 5000);
+        }, 300000);
         Log.info('Enabling the relay...');
         return this.write(1);
     }
