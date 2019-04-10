@@ -9,11 +9,11 @@ const fs = require('fs');
 const _ = require('lodash');
 
 // We import users data
-let users = fs.readFileSync('./users.json');
+let users = fs.readFileSync(path.resolve(__dirname, 'users.json'));
 users = JSON.parse(users);
 
 // We import settings data
-let settings = fs.readFileSync('./settings.json');
+let settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
 settings = JSON.parse(settings);
 
 // We instantiate server and the Relay
