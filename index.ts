@@ -136,3 +136,9 @@ app.get('/change_state', restrict, async function (req, res) {
 //start server
 app.listen(3000);
 Log.info('Server started on port 3000');
+
+// when the script exits
+process.on('SIGINT', () => {
+    relay.unexport();
+    process.exit(0)
+});
