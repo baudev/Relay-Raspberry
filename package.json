@@ -18,7 +18,7 @@
     "express-session": "^1.15.6",
     "simple-node-logger": "^18.12.22",
     "fs": "^0.0.1-security",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "ejs": "^2.6.1"
   },
   "devDependencies": {
