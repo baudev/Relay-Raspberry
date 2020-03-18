@@ -1,39 +1,59 @@
 # Relay Raspberry Pi Activation Server
 
-This repository allows to enable and disable a relay through a web server (with authentication).
+This repository allows to enable and disable a relay in TypeScript.
 
 ## Installation
 
 ```
-git clone https://github.com/baudev/Relay-Raspberry-Server.git
-cd Relay-Raspberry-Server/
-npm install // install dependencies
-npm run tsc // Compile TypeScript files into JavaScript
-sudo node index.js // run the server!
+npm i relay-raspberry
 ```
 
-## Configuration
+## Usage
 
-- Global settings are defined in the `settings.json` file:
- 
-    - `PanelName` The title of the panel page (by default `PANEL`)
-    - `RelayName` The title of the card (by default `RELAY NAME`)
-    - `DisableAfterXSeconds` After how many seconds the relay would be disabled (by default `300`)
-    - `DebugMode` If debug logs must be saved (by default `true`)
-    - `GPIONumber` The GPIO pin which controls the relay
-    
-- User settings are defined in `users.json`
+An example enabling the relay on the GPIO 4 and printing its current state.
 
-## Preview
+```typescript
+let relay = new Relay(4, 7000); // 4 is the PIN number, 7000 is the number of seconds after which the relay will be deactivated.
+relay.enable(); // enables the relay
 
-<p align="center">
-  <img src="/doc/preview.png">
-</p>
+// Gets the current state of the relay
+relay.getState().then((value) => {
+    switch (value) {
+        case 1:
+            console.log("Enabled !");
+            break;
+        case 0:
+            console.log("Disabled !");
+            break;
+    }
+});
+```
+
+## API
+
+### Class Relay
+
+**Relay(gpioPin [, disableAfterXSeconds])**
+
++ gpioPin - (_number_) The pin of the relay to be controlled.
++ [disableAfterXSeconds] - (*number*) An optional number specifying the number of seconds after which the relay will be automatically deactivated.
+
+**enable(): Promise<void>**
+
+Enables the relay.
+
+**disable(): Promise<void>**
+
+Disables the relay.
+
+**getState(): Promise<number>**
+
+Returns the current state of the relay. `1` means enabled. `0` means disabled.
 
 ## Electronic Notes
 
 <p align="center">
-  <img src="/doc/schema.png">
+  <img src="https://github.com/baudev/Relay-Raspberry-Server/blob/master/doc/schema.png?raw=true">
 </p>
 
 This project uses:

@@ -1,13 +1,20 @@
 {
-  "name": "relay-raspberry-activation-server",
-  "version": "1.0.0",
-  "description": "Enables a relay with a Raspberry Pi through a web server",
-  "main": "index.js",
+  "name": "relay-raspberry",
+  "version": "1.1.0",
+  "description": "Enables a relay with a Raspberry Pi",
   "scripts": {
-    "tsc": "tsc",
+    "build": "rm -rf ./build && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Baudev",
+  "keywords": [
+    "Relay",
+    "TypeScript",
+    "Raspberry"
+  ],
+  "author": {
+    "name": "Baudev",
+    "email": "baudev.contact@gmail.com"
+  },
   "license": "MIT",
   "dependencies": {
     "@types/es6-promise": "^3.3.0",
