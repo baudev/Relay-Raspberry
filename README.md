@@ -1,4 +1,4 @@
-# Relay Raspberry Pi Activation Server
+# Relay Raspberry Pi
 
 This repository allows to enable and disable a relay in TypeScript.
 
