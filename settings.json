@@ -1,7 +1,0 @@
-{
-  "PanelName": "PANEL",
-  "RelayName": "RELAY NAME",
-  "DisableAfterXSeconds": 300,
-  "DebugMode": true,
-  "GPIONumber": 4
-}
