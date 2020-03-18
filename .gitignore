@@ -5,7 +5,10 @@ node_modules/
 *.js
 
 # IntelliJ
-.idea
+.idea/
 
 # Config
 users.json
+
+# JS build
+build/
