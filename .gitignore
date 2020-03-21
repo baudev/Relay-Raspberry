@@ -9,6 +9,3 @@ node_modules/
 
 # Config
 users.json
-
-# JS build
-build/
