@@ -2,12 +2,10 @@
   "name": "relay-raspberry",
   "version": "1.1.1",
   "description": "Enables a relay with a Raspberry Pi",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "build/Relay.js",
+  "types": "build/Relay.d.ts",
   "scripts": {
-    "build": "rm -rf ./build && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "npm run build"
+    "build": "tsc"
   },
   "keywords": [
     "Relay",
@@ -22,14 +20,14 @@
   "dependencies": {
     "@types/es6-promise": "^3.3.0",
     "@types/node": "^11.11.6",
-    "onoff": "^4.1.1",
+    "ejs": "^2.6.1",
     "express": "^4.16.4",
-    "path": "^0.12.7",
     "express-session": "^1.15.6",
-    "simple-node-logger": "^18.12.22",
     "fs": "^0.0.1-security",
-    "lodash": "^4.17.11",
-    "ejs": "^2.6.1"
+    "lodash": "^4.17.13",
+    "onoff": "^4.1.1",
+    "path": "^0.12.7",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "typescript": "^3.3.4000"

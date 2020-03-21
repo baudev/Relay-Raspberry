@@ -1,7 +1,6 @@
 import {BinaryValue} from "onoff";
 import {Promise} from 'es6-promise'
-import Log from "./LogUtil";
-
+const Log = require("./LogUtil");
 const Gpio = require('onoff').Gpio;
 
 /**
@@ -9,7 +8,7 @@ const Gpio = require('onoff').Gpio;
  * @author Baudev
  * @since 1.0
  */
-export default class Relay extends Gpio {
+export class Relay extends Gpio {
 
     private _disableAfterXSeconds: number;
 
@@ -21,7 +20,7 @@ export default class Relay extends Gpio {
      */
     constructor(gpioPin: number, disableAfterXSeconds : number = 5000) {
         super(gpioPin, 'out');
-        Log.info('Relay instantiated');
+        Log.debug('Relay instantiated');
         this.disable(); // we disable on start the relay
         Log.info('The relay will be disabled automatically after ' + disableAfterXSeconds + ' seconds');
         this.disableAfterXSeconds = disableAfterXSeconds;
