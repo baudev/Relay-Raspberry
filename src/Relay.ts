@@ -1,6 +1,6 @@
 import {BinaryValue} from "onoff";
 import {Promise} from 'es6-promise'
-const Log = require("./LogUtil");
+import Log from "./LogUtil";
 const Gpio = require('onoff').Gpio;
 
 /**

@@ -20,10 +20,9 @@ let options = {
         colorize: true,
     },
 };
-const logger = winston.createLogger({
+export default winston.createLogger({
     transports: [
         new winston.transports.File(options.file),
         new winston.transports.Console(options.console)
     ]
 });
-module.exports = logger;

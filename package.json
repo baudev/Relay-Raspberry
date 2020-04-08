@@ -5,7 +5,8 @@
   "main": "build/Relay.js",
   "types": "build/Relay.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "npm run build"
   },
   "keywords": [
     "Relay",
